@@ -17,7 +17,7 @@ workflow map_samples {
 
 process run_sample_mapping {
     cpus 22
-    debug true
+    debug false
     memory '40 GB'
     publishDir "results/mapping"
 
@@ -34,6 +34,5 @@ process run_sample_mapping {
     bowtie2 -x ${files[1].baseName.replaceAll(/\.\d+/, '')} -p 16 -a -U ${files[0]} \
     | samtools view -bS - \
     | samtools sort -@ 4 -m 4G -o ${sample_name}.sorted.bam && samtools index ${sample_name}.sorted.bam
-    echo ${sample_name}
     """
 }
