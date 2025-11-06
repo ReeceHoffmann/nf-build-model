@@ -105,6 +105,7 @@ process associate_sample_labels {
 
 process extract_sample_viruses {
   cpus 1
+  debug true
   memory "5 GB"
   publishDir "results/sample_viruses"
 

@@ -9,12 +9,7 @@ workflow collapse_reference {
     def organize_sequences_py = file("scripts/organize_sequences.py")
     def repair_py = file("scripts/repair.py")
 
-    repaired_reference_path = repair_reference(
-        reference_json_path,
-        repair_py,
-    )
-
-    otu_paths = organize_sequences(repaired_reference_path, organize_sequences_py) | flatten
+    otu_paths = organize_sequences(reference_json_path, organize_sequences_py) | flatten
 
     cluster_paths = otu_paths
         | flatMap { p ->
@@ -23,7 +18,7 @@ workflow collapse_reference {
         | cluster_with_cdhit
         | collect
 
-    collapsed = finish(cluster_paths, repaired_reference_path, finish_py)
+    collapsed = finish(cluster_paths, reference_json_path, finish_py)
 
     emit:
     collapsed

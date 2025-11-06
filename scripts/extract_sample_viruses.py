@@ -7,27 +7,36 @@ sample_labels_path = sys.argv[1]
 reference_json_path = sys.argv[2]
 output_path = sys.argv[3]
 
-with open (reference_json_path, "r") as f:
+sequence_ids_by_virus_id = {}
+virus_id_by_name = {}
+
+with open(reference_json_path) as f:
     reference = json.load(f)
 
-    virus_segs = {} #{virus_id: [sequence_id_1, ...],}
-
     for otu in reference["otus"]:
-        segments = []
+        virus_id_by_name[otu["name"]] = otu["_id"]
+        sequence_ids = []
+
         for isolate in otu["isolates"]:
             for sequence in isolate["sequences"]:
-                segments.append(sequence["_id"])
-        virus_segs[otu["_id"]] = segments
+                sequence_ids.append(sequence["_id"])
+
+        sequence_ids_by_virus_id[otu["_id"]] = sequence_ids
 
 
-with open(sample_labels_path, "r") as sample_labels_f, open(output_path, "w") as output_f:
+with (
+    open(sample_labels_path, "r") as sample_labels_f,
+    open(output_path, "w") as output_f,
+):
     sample_labels = csv.reader(sample_labels_f)
     next(sample_labels)
-    
+
     sample_viruses = {}
-   
+
     for row in sample_labels:
         sample_name = Path(row[2]).stem.split(".")[0]
-        sample_viruses.setdefault(sample_name, []).extend(virus_segs[row[0]])
+        virus_name = row[0]
+        virus_id = virus_id_by_name[virus_name]
+        sample_viruses.setdefault(sample_name, []).extend(sequence_ids_by_virus_id[virus_id])
 
     json.dump(sample_viruses, output_f)

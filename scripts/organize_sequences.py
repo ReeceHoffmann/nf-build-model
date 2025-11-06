@@ -11,6 +11,11 @@ with open(json_path) as f:
     data = json.load(f)
 
 
+# In ref-builder references, the same sequence ID can appear multiple times with the
+# same content.
+written_sequence_ids = set()
+
+
 for otu in data["otus"]:
     otu_id = otu["_id"]
     otu_path = otus_path / otu["_id"]
@@ -18,6 +23,11 @@ for otu in data["otus"]:
 
     for isolate in otu["isolates"]:
         for sequence in isolate["sequences"]:
+            sequence_id = sequence["_id"]
+
+            if sequence_id in written_sequence_ids:
+                continue
+
             segment_name = sequence["segment"]
             segment_path = otu_path / segment_name
 
@@ -25,3 +35,5 @@ for otu in data["otus"]:
 
             with open(segment_path / "sequences.fa", "a") as f:
                 f.write(f">{sequence['_id']}\n{sequence['sequence']}\n")
+
+            written_sequence_ids.add(sequence_id)

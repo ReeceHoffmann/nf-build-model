@@ -9,6 +9,6 @@ output_path <- args[2]
 
 virus_segments = readDNAStringSet(virus_segments_path)
 
-unreliable_regions = create_high_nucleotide_content(0.6, 0.45, 75, virus_segments)
+unreliable_regions = create_high_nucleotide_content(0.9, 0.9, 25, virus_segments)
 
 write.csv(unreliable_regions, output_path, row.names=FALSE)
