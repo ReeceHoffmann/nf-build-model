@@ -8,13 +8,11 @@ reference_json_path = sys.argv[2]
 output_path = sys.argv[3]
 
 sequence_ids_by_virus_id = {}
-virus_id_by_name = {}
 
 with open(reference_json_path) as f:
     reference = json.load(f)
 
     for otu in reference["otus"]:
-        virus_id_by_name[otu["name"]] = otu["_id"]
         sequence_ids = []
 
         for isolate in otu["isolates"]:
@@ -34,9 +32,8 @@ with (
     sample_viruses = {}
 
     for row in sample_labels:
-        sample_name = Path(row[2]).stem.split(".")[0]
-        virus_name = row[0]
-        virus_id = virus_id_by_name[virus_name]
+        sample_name = Path(row[0]).stem.split(".")[0]
+        virus_id = row[10]
         sample_viruses.setdefault(sample_name, []).extend(sequence_ids_by_virus_id[virus_id])
 
     json.dump(sample_viruses, output_f)

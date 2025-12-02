@@ -21,7 +21,9 @@ def parse_clstr(path: Path) -> Iterator[dict]:
     cluster = None
 
     with open(path) as f:
+        
         for line in f:
+            
             if line[0] == ">":
                 if cluster:
                     yield cluster
@@ -36,6 +38,10 @@ def parse_clstr(path: Path) -> Iterator[dict]:
 
                 sequence_id = line.split(">")[1].split("...")[0]
                 cluster["members"].append(sequence_id)
+
+
+        if cluster is not None:
+            yield cluster
 
 
 def parse_fasta(path: Path):

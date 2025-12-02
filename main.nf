@@ -8,7 +8,7 @@ include { map_samples } from './subworkflows/map_samples.nf'
 
 params.host = "input/arabidopsis_thaliana.fa.gz"
 params.reference = "input/reference.json"
-params.labels = "input/sample_labels.csv"
+params.labels = "input/viruses.csv"
 params.samples = "input/samples/*"
 
 workflow {
@@ -21,11 +21,9 @@ workflow {
   def samples = file(params.samples)
   def samples_dir_path = samples[0].parent
 
-  def associate_sample_labels_py = file("scripts/associate_sample_labels.py")
-  sample_labels = associate_sample_labels(associate_sample_labels_py, labels, samples_dir_path)
 
   def extract_sample_viruses_py = file("scripts/extract_sample_viruses.py")
-  sample_viruses = extract_sample_viruses(extract_sample_viruses_py, sample_labels, file(params.reference))
+  sample_viruses = extract_sample_viruses(extract_sample_viruses_py, labels, file(params.reference))
 
   collapsed = collapse_reference(reference)
   collapsed_fasta = collapsed | map { it[0] }
@@ -105,7 +103,6 @@ process associate_sample_labels {
 
 process extract_sample_viruses {
   cpus 1
-  debug true
   memory "5 GB"
   publishDir "results/sample_viruses"
 
@@ -125,7 +122,7 @@ process extract_sample_viruses {
 
 process rle_encode_mappings {
   cpus 1
-  memory "5 GB"
+  memory "45 GB"
   publishDir "results/rle"
 
   input:
